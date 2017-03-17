@@ -1,0 +1,25 @@
+{
+  "name": "icebase",
+  "version": "1.0.0",
+  "description": "realtime database",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/olivierchatry/icebase.git"
+  },
+  "keywords": [
+    "realtime",
+    "database"
+  ],
+  "author": "Olivier Chatry",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/olivierchatry/icebase/issues"
+  },
+  "homepage": "https://github.com/olivierchatry/icebase#readme",
+  "dependencies": {
+    "express": "^4.15.2",
+    "minimist": "^1.2.0",
+    "nodejs-websocket": "^1.7.1"
+  }
+}
