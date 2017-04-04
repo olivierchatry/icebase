@@ -1,0 +1,1 @@
+{"cmd":0,"path":"/comments","data":{"data":{"attributes":{"text":"this is a text"},"relationships":{"post":{"data":{"type":"posts","id":"--KgtJWGcnvbQVEAN3yx_"}}},"type":"comments"}}}

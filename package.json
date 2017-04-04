@@ -20,6 +20,8 @@
   "dependencies": {
     "express": "^4.15.2",
     "minimist": "^1.2.0",
-    "nodejs-websocket": "^1.7.1"
+    "nodejs-websocket": "^1.7.1",
+    "pluralize": "^4.0.0",
+    "string": "^3.3.3"
   }
 }

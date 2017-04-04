@@ -1,0 +1,6 @@
+{
+	"port": 8080,
+	"currentRevision": 0,
+	"dataPath": "./data/",
+	"schema": "./schema.dev.json"
+}

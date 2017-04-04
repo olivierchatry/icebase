@@ -1,0 +1,20 @@
+{
+	"posts":{
+		"comments":{
+			"type":"many",
+			"model":"comments"
+		},
+		"text":{
+			"type":"string"
+		}
+	},
+	"comments":{
+		"post":{
+			"type":"belongs",
+			"model":"posts"
+		},
+		"text":{
+			"type":"string"
+		}
+	}
+}
