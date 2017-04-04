@@ -31,12 +31,13 @@ const GLOBAL_DATA 		= {
 
 
 const	iceGetData = (paths) => {
-	const obj = GLOBAL_DATA
-	const path = path.split('/').forEach(
-		(sub) => {
-			obj = obj[sub] = obj[sub] || {}
-		}
-	)	
+	let obj = GLOBAL_DATA
+	obj = obj[paths.shift()]
+	if (obj && paths.length) {
+		obj = obj[paths.shift()]
+	}		
+	/*while (path.length)	{
+	}*/
 	return obj
 }
 
@@ -80,15 +81,20 @@ const	iceSetData = (id, paths, query, callback) => {
 	if (!GLOBAL_DATA[model]) {
 		GLOBAL_DATA[model] = {}
 	}		
-	GLOBAL_DATA[model][id] = query.data.attributes
+	GLOBAL_DATA[model][id] = {
+		attributes:query.data.attributes,		
+		id,
+		type:PLURALIZE.singular(query.data.type)
+	}
 
 	for (let key in query.data.relationships) {
 		const relationship = query.data.relationships[key]
-		GLOBAL_DATA[model][id][key] = {}
+		GLOBAL_DATA[model][id].relationships = GLOBAL_DATA[model][id].relationships || {}
+		GLOBAL_DATA[model][id].relationships[key] = {}
 
 		const fun = (data) => {
 			if (iceValidateData(model, key, relationship, errors)) {
-				GLOBAL_DATA[model][id][key][data.id] = true
+				GLOBAL_DATA[model][id].relationships[key][data.id] = true
 			}
 		}
 		if (Array.isArray(relationship.data)) {
@@ -100,11 +106,7 @@ const	iceSetData = (id, paths, query, callback) => {
 	if (callback) {
 		if (errors.length) {
 		} else {
-			const data = query.data
-			data.type = PLURALIZE.singular(data.type)
-			data.id = id
-
-			callback(null, 201, data)
+			callback(null, 201, GLOBAL_DATA[model][id])
 		}
 	}
 	return errors
@@ -119,8 +121,7 @@ const iceExecute = (revision, callback) => {
 			return iceSetData(revision.id, paths, revision.data, callback)
 		break;
 		case COMMAND.update:
-			const existing = iceGetData(revision.path)
-			Object.assign(existing, revision.data)
+			return iceSetData(revision.data.data.id, paths, revision.data, callback)
 		break;
 		case COMMAND.delete:
 			return iceSetData(paths, null, callback)
@@ -148,6 +149,33 @@ const iceExecuteAndSave = (cmd, path, data, callback) => {
 	)
 }
 
+const iceGet = (path, callback) => {
+	const paths = path.split('/').filter(
+		s => !STRING(s).isEmpty()
+	)
+	let obj = GLOBAL_DATA[paths.shift()]
+	if (obj && paths.length) {
+		obj = obj[paths.shift()]
+	}
+	while(obj && paths.length) {
+		const relationName = paths.shift()
+		if (obj.relationships[relationName]) {
+			obj = obj.relationships[relationName]
+		}
+		if (obj && paths.length) {
+			const id = paths.shift()
+			if (obj[id]) {
+				obj = GLOBAL_DATA[obj.type][id]
+				obj.id = id
+				obj.type = PLURALIZE.singular(obj.type)
+			} else {
+				obj = null
+			}
+		}
+	}
+	callback(null, 200, obj)
+}
+
 const iceProcessRequest = function (request, response) {
 	const url = URL.parse(request.url)
 	const path = url.path
@@ -158,14 +186,17 @@ const iceProcessRequest = function (request, response) {
 			response.writeHead(500, err.message,  {"Content-Type": "application/vnd.api+json", "Access-Control-Allow-Origin":"*"})
 		} else {
 			response.writeHead(status, {"Content-Type": "application/vnd.api+json", "Access-Control-Allow-Origin":"*"})			
-			response.write(JSON.stringify({data:result}))			
+			if (result) {
+				response.write(JSON.stringify({data:result}))			
+			}			
 		}
 		response.end()					
 	}
 	switch (request.method) {
 		case 'GET': {			
-			response.writeHead(200, {'Content-Type':'application/json', "Access-Control-Allow-Origin":"*"})					
-			response.pipe(iceGetData(path))
+			iceGet(path, callback)
+			//response.writeHead(200, {'Content-Type':'application/json', "Access-Control-Allow-Origin":"*"})					
+			//response.pipe(iceGetData(path))
 		}
 		break;
 		case 'PATCH':
@@ -191,6 +222,7 @@ const iceProcessRequest = function (request, response) {
 		case 'OPTIONS':{
 			response.writeHead(200, {
 				'Access-Control-Allow-Origin':'*',
+				'Access-Control-Allow-Methods':'POST,GET,OPTIONS,PATCH,DELETE',
 				'Access-Control-Allow-Headers':'Content-Type'
 			})					
 			response.end()
