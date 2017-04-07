@@ -5,32 +5,54 @@ const isString = (v) => typeof v === 'string'
 
 module.exports = (schema) => {
 
-	const VALIDATOR_FOR_TYPE 		= {
-		"string":(val) => isString(val),
-		"numerical":(val) => typeof val === 'number',
-		"date":(val) => STRING(val).isNumeric(),
-		"many":(val) => Array.isArray(val) && val.every( isString ),
-		"belongs":(val) => isString(val.data.id) && schema[val.data.type]
+	const DEFINITION 		= {
+		"string":			{
+			validator:(val) => isString(val),
+			type:	"attributes"
+		},
+		"numerical":	{
+			validator:(val) => typeof val === 'number',
+			type: "attributes"
+		},
+		"date":				{
+			validator:(val) => STRING(val).isNumeric(),
+			type: "attributes"
+		},
+		"many":				{
+			validator:(val) => Array.isArray(val) && val.every( isString ),
+			type:	"relationships"
+		},
+		"belongs":		{
+			validator:(val) => isString(val.data.id) && schema[val.data.type],
+			type:	"relationships"
+		}
 	}
 	
-	const validatorsForModel = {}
+	const parsedSchemata = {}
 	for (let modelName in schema) {		
-		const model = schema[modelName]				
-		const validators = {}
+		const model 				= schema[modelName]				
+		const parsedSchema	= {
+			validators:{},
+			attributes:{},
+			relationships:{}			
+		}	
+
 		for (let entryName in model) {
 			const entry = model[entryName]
+
 			if (STRING(entry.type).isEmpty()) {
 				throw new Error(`Schema type for ${modelName}.${entryName} is not defined`)
 			}
+
 			const type = entry.type.trim()
-			const validator = VALIDATOR_FOR_TYPE[type]
-			if (!validator) {
+			const definition = DEFINITION[type]
+			if (!definition) {
 				throw new Error(`Schema type ${type} for ${modelName}.${entryName} is not valid, see documentation for supported types`)
-			}
-			validators[entryName] = validator
-		}
-		validatorsForModel[modelName] = validators
-		validatorsForModel[PLURALIZE.singular(modelName)] = validators
+			}			
+			parsedSchema.validators[entryName] = definition.validator
+			parsedSchema[definition.type][entryName] = type
+		}	
+		parsedSchemata[PLURALIZE.singular(modelName)] = parsedSchemata[modelName] = parsedSchema		
 	}
-	return validatorsForModel
+	return parsedSchemata
 }

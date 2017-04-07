@@ -1,6 +1,7 @@
 {
 	"port": 8080,
 	"currentRevision": 0,
-	"dataPath": "./data/",
+	"revisionPath": "./data/revisions/",
+	"snapShotPath": "./data/snap-shots/",
 	"schema": "./schema.dev.json"
 }

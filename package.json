@@ -2,7 +2,7 @@
   "name": "icebase",
   "version": "1.0.0",
   "description": "realtime database",
-  "main": "index.js",
+  "main": "iceMain.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/olivierchatry/icebase.git"
@@ -18,8 +18,11 @@
   },
   "homepage": "https://github.com/olivierchatry/icebase#readme",
   "dependencies": {
+    "body-parser": "^1.17.1",
+    "cookie-parser": "^1.4.3",
     "express": "^4.15.2",
     "minimist": "^1.2.0",
+    "morgan": "^1.8.1",
     "nodejs-websocket": "^1.7.1",
     "pluralize": "^4.0.0",
     "string": "^3.3.3"

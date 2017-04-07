@@ -6,7 +6,7 @@ const FS							= require('fs')
 const QS							= require('querystring')
 const ARGV 						= require('minimist')(process.argv.slice(2))
 const STRING 					= require('string')
-const TIMESYNCSERVER	= require('timesync/server')
+
 const PLURALIZE				= require('pluralize')
 
 const ICE							= require('./ice')

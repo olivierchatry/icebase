@@ -7,7 +7,8 @@ module.exports = (() => {
 		let duplicateTime = (now === lastPushTime)
 		lastPushTime = now
 		let timeStampChars = new Array(9);
-		for (let i = 8; i >= 0; i--) {
+
+		for (let i = 7; i >= 0; i--) {
       timeStampChars[i] = PUSH_CHARS.charAt(now % 64);      
       now = Math.floor(now / 64);
     }
@@ -30,7 +31,7 @@ module.exports = (() => {
     for (i = 0; i < 12; i++) {
       id += PUSH_CHARS.charAt(lastRandChars[i]);
     }
-    if(id.length != 21) {
+    if(id.length != 20) {
 			throw new Error('Length should be 20.');
 		}
     return id;		
