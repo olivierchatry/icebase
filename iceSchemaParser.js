@@ -34,7 +34,8 @@ module.exports = (schema) => {
 		const parsedSchema	= {
 			validators:{},
 			attributes:{},
-			relationships:{}			
+			relationships:{},
+			type:modelName
 		}	
 
 		for (let entryName in model) {

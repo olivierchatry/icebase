@@ -7,6 +7,7 @@ const BODY_PARSER 		= require('body-parser');
 const ARGV 						= require('minimist')(process.argv.slice(2))
 const ICE							= require('./ice');
 const ICE_DATA 				= require('./iceData')
+
 const CORS						= require('cors')
 
 if (STRING(ARGV.configuration).isEmpty()) {
@@ -92,6 +93,10 @@ app.post(`${CONFIGURATION.serverPath}/:type`, function(req, res, next) {
 			type:req.params.type,
 			data:value
 		})
+		
+		const jsonapi = iceGenerateJSONAPI(value, req._schema)
+		res.status(201).json(jsonapi).end()
+		return next()
 	}
 })
 
